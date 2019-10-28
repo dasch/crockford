@@ -1,7 +1,7 @@
-module Example exposing (..)
+module CrockfordTests exposing (suite)
 
 import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
+import Fuzz
 import Test exposing (..)
 
 
