@@ -2,19 +2,26 @@ module Crockford exposing (decode, encode)
 
 
 encode : Int -> String
-encode n =
+encode x =
     let
-        div =
-            n // 32
+        encodeAsCharList : Int -> List Char
+        encodeAsCharList n =
+            let
+                div =
+                    n // 32
 
-        rem =
-            modBy 32 n
+                rem =
+                    modBy 32 n
+            in
+            if div > 0 then
+                encodeSmallInt rem :: encodeAsCharList div
+
+            else
+                [ encodeSmallInt rem ]
     in
-    if div > 0 then
-        encode div ++ encodeSmallInt rem
-
-    else
-        encodeSmallInt rem
+    encodeAsCharList x
+        |> List.reverse
+        |> String.fromList
 
 
 decode : String -> Int
@@ -23,107 +30,107 @@ decode s =
         |> List.foldl (\chr num -> num * 32 + decodeSmallInt chr) 0
 
 
-encodeSmallInt : Int -> String
+encodeSmallInt : Int -> Char
 encodeSmallInt n =
     case n of
         0 ->
-            "0"
+            '0'
 
         1 ->
-            "1"
+            '1'
 
         2 ->
-            "2"
+            '2'
 
         3 ->
-            "3"
+            '3'
 
         4 ->
-            "4"
+            '4'
 
         5 ->
-            "5"
+            '5'
 
         6 ->
-            "6"
+            '6'
 
         7 ->
-            "7"
+            '7'
 
         8 ->
-            "8"
+            '8'
 
         9 ->
-            "9"
+            '9'
 
         10 ->
-            "A"
+            'A'
 
         11 ->
-            "B"
+            'B'
 
         12 ->
-            "C"
+            'C'
 
         13 ->
-            "D"
+            'D'
 
         14 ->
-            "E"
+            'E'
 
         15 ->
-            "F"
+            'F'
 
         16 ->
-            "G"
+            'G'
 
         17 ->
-            "H"
+            'H'
 
         18 ->
-            "J"
+            'J'
 
         19 ->
-            "K"
+            'K'
 
         20 ->
-            "M"
+            'M'
 
         21 ->
-            "N"
+            'N'
 
         22 ->
-            "P"
+            'P'
 
         23 ->
-            "Q"
+            'Q'
 
         24 ->
-            "R"
+            'R'
 
         25 ->
-            "S"
+            'S'
 
         26 ->
-            "T"
+            'T'
 
         27 ->
-            "V"
+            'V'
 
         28 ->
-            "W"
+            'W'
 
         29 ->
-            "X"
+            'X'
 
         30 ->
-            "Y"
+            'Y'
 
         31 ->
-            "Z"
+            'Z'
 
         _ ->
-            "#"
+            '#'
 
 
 decodeSmallInt : Char -> Int
