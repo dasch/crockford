@@ -1,8 +1,13 @@
-module Crockford exposing (decode, encode)
+module Crockford exposing (decode, decodeWithChecksum, encode, encodeWithChecksum)
 
 
 encode : Int -> String
 encode x =
+    encodeAdvanced x False
+
+
+encodeAdvanced : Int -> Bool -> String
+encodeAdvanced x checksum =
     let
         encodeAsCharList : Int -> List Char
         encodeAsCharList n =
@@ -18,8 +23,17 @@ encode x =
 
             else
                 [ encodeSmallInt rem ]
+
+        insertChecksum : List Char -> List Char
+        insertChecksum chars =
+            if checksum then
+                encodeSmallInt (checksumOf x) :: chars
+
+            else
+                chars
     in
     encodeAsCharList x
+        |> insertChecksum
         |> List.reverse
         |> String.fromList
 
@@ -42,6 +56,7 @@ decode s =
 encodeSmallInt : Int -> Char
 encodeSmallInt n =
     case n of
+        -- Symbol set:
         0 ->
             '0'
 
@@ -138,6 +153,23 @@ encodeSmallInt n =
         31 ->
             'Z'
 
+        -- Checksum symbols:
+        32 ->
+            '*'
+
+        33 ->
+            '~'
+
+        34 ->
+            '$'
+
+        35 ->
+            '='
+
+        36 ->
+            'U'
+
+        -- Out of bounds:
         _ ->
             '#'
 
@@ -252,5 +284,59 @@ decodeChar n =
         'Z' ->
             31
 
+        -- Checksum symbols:
+        '*' ->
+            32
+
+        '~' ->
+            33
+
+        '$' ->
+            34
+
+        '=' ->
+            35
+
+        'U' ->
+            36
+
+        -- Out of bounds:
         _ ->
             -1
+
+
+
+-- Checksums
+
+
+checksumBase : Int
+checksumBase =
+    37
+
+
+checksumOf : Int -> Int
+checksumOf n =
+    modBy checksumBase n
+
+
+encodeWithChecksum : Int -> String
+encodeWithChecksum x =
+    encodeAdvanced x True
+
+
+decodeWithChecksum : String -> Maybe Int
+decodeWithChecksum s =
+    let
+        checksum =
+            String.right 1 s
+                |> decode
+
+        n =
+            String.dropRight 1 s
+                |> decode
+    in
+    if checksumOf n == checksum then
+        Just n
+
+    else
+        Nothing
