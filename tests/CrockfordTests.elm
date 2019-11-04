@@ -25,6 +25,9 @@ decodingTests =
     describe "decoding"
         [ fuzz nonNegativeInt "round trip" <|
             \n -> Expect.equal n (decode (encode n))
+        , test "`I` is treated as `1`" <|
+            \_ ->
+                Expect.equal 1 (decode "I")
         ]
 
 

@@ -136,6 +136,11 @@ encodeSmallInt n =
 decodeSmallInt : Char -> Int
 decodeSmallInt n =
     case n of
+        -- Special cases:
+        'I' ->
+            1
+
+        -- General cases:
         '0' ->
             0
 
