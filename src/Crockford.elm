@@ -80,19 +80,32 @@ encodeAdvanced x checksum =
     Crockford.decode "19S" --> 1337 : Int
 
 -}
-decode : String -> Int
+decode : String -> Result String Int
 decode s =
     let
-        integrateChar chr num =
-            if chr == '-' then
-                num
+        integrateChar chr numOrErr =
+            case numOrErr of
+                Ok num ->
+                    if chr == '-' then
+                        Ok num
 
-            else
-                num * 32 + decodeChar chr
+                    else
+                        let
+                            encodedChar =
+                                decodeChar chr
+                        in
+                        if encodedChar < 0 then
+                            Err ("invalid base32 character `" ++ String.fromChar chr ++ "`")
+
+                        else
+                            Ok (num * 32 + encodedChar)
+
+                Err err ->
+                    Err err
     in
     String.toUpper s
         |> String.toList
-        |> List.foldl integrateChar 0
+        |> List.foldl integrateChar (Ok 0)
 
 
 encodeSmallInt : Int -> Char
@@ -366,19 +379,28 @@ encodeWithChecksum x =
     encodeAdvanced x True
 
 
-decodeWithChecksum : String -> Maybe Int
+decodeWithChecksum : String -> Result String Int
 decodeWithChecksum s =
     let
-        checksum =
-            String.right 1 s
-                |> decode
-
-        n =
+        encodedData =
             String.dropRight 1 s
-                |> decode
-    in
-    if checksumOf n == checksum then
-        Just n
 
-    else
-        Nothing
+        encodedChecksum =
+            String.right 1 s
+
+        validateChecksum n checksum =
+            if checksumOf n == checksum then
+                Ok n
+
+            else
+                Err "invalid checksum"
+    in
+    decode encodedData
+        |> Result.andThen
+            (\data ->
+                decode encodedChecksum
+                    |> Result.andThen
+                        (\checksum ->
+                            validateChecksum data checksum
+                        )
+            )

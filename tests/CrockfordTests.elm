@@ -21,19 +21,22 @@ encodingTests =
             \_ ->
                 Expect.equal "16J" (encode 1234)
         , fuzz nonNegativeInt "round trip" <|
-            \n -> Expect.equal n (decode (encode n))
+            \n -> Expect.equal (Ok n) (decode (encode n))
         , test "`I` is treated as `1`" <|
             \_ ->
-                Expect.equal 1 (decode "I")
+                Expect.equal (Ok 1) (decode "I")
         , test "`L` is treated as `1`" <|
             \_ ->
-                Expect.equal 1 (decode "L")
+                Expect.equal (Ok 1) (decode "L")
         , test "`O` is treated as `0`" <|
             \_ ->
-                Expect.equal 0 (decode "O")
+                Expect.equal (Ok 0) (decode "O")
         , test "`-` is ignored" <|
             \_ ->
                 Expect.equal (decode "ABCDEF123") (decode "ABC-DEF-123")
+        , test "invalid symbols cause failure" <|
+            \_ ->
+                Expect.equal (Err "invalid base32 character `#`") (decode "123#")
         , fuzz nonNegativeInt "decoding is case insensitive" <|
             \n ->
                 let
@@ -53,12 +56,16 @@ checksumTests =
         , test "decoding with checksum" <|
             \_ ->
                 decodeWithChecksum "1A5"
-                    |> Expect.equal (Just 42)
+                    |> Expect.equal (Ok 42)
+        , test "failing on invalid checksum symbol" <|
+            \_ ->
+                decodeWithChecksum "1A@"
+                    |> Expect.equal (Err "invalid base32 character `@`")
         , fuzz nonNegativeInt "round trip" <|
             \n ->
                 encodeWithChecksum n
                     |> decodeWithChecksum
-                    |> Expect.equal (Just n)
+                    |> Expect.equal (Ok n)
         ]
 
 
