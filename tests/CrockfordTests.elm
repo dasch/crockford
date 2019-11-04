@@ -28,6 +28,9 @@ decodingTests =
         , test "`I` is treated as `1`" <|
             \_ ->
                 Expect.equal 1 (decode "I")
+        , test "`L` is treated as `1`" <|
+            \_ ->
+                Expect.equal 1 (decode "L")
         , test "`O` is treated as `0`" <|
             \_ ->
                 Expect.equal 0 (decode "O")

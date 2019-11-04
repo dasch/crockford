@@ -141,6 +141,9 @@ decodeSmallInt n =
         'I' ->
             1
 
+        'L' ->
+            1
+
         'O' ->
             0
 
