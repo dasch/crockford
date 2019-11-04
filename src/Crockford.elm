@@ -3,6 +3,11 @@ module Crockford exposing (decode, decodeWithChecksum, encode, encodeWithChecksu
 
 encode : Int -> String
 encode x =
+    encodeAdvanced x False
+
+
+encodeAdvanced : Int -> Bool -> String
+encodeAdvanced x checksum =
     let
         encodeAsCharList : Int -> List Char
         encodeAsCharList n =
@@ -18,8 +23,17 @@ encode x =
 
             else
                 [ encodeSmallInt rem ]
+
+        insertChecksum : List Char -> List Char
+        insertChecksum chars =
+            if checksum then
+                encodeSmallInt (checksumOf x) :: chars
+
+            else
+                chars
     in
     encodeAsCharList x
+        |> insertChecksum
         |> List.reverse
         |> String.fromList
 
@@ -307,15 +321,7 @@ checksumOf n =
 
 encodeWithChecksum : Int -> String
 encodeWithChecksum x =
-    let
-        encoded =
-            encode x
-
-        checkSymbol =
-            encodeSmallInt (checksumOf x)
-                |> String.fromChar
-    in
-    String.append encoded checkSymbol
+    encodeAdvanced x True
 
 
 decodeWithChecksum : String -> Maybe Int
