@@ -32,7 +32,7 @@ decode s =
                 num
 
             else
-                num * 32 + decodeSmallInt chr
+                num * 32 + decodeChar chr
     in
     String.toUpper s
         |> String.toList
@@ -142,8 +142,8 @@ encodeSmallInt n =
             '#'
 
 
-decodeSmallInt : Char -> Int
-decodeSmallInt n =
+decodeChar : Char -> Int
+decodeChar n =
     case n of
         -- Special cases:
         'I' ->
