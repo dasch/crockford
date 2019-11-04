@@ -1,6 +1,43 @@
-module Crockford exposing (decode, decodeWithChecksum, encode, encodeWithChecksum)
+module Crockford exposing
+    ( encode, decode
+    , encodeWithChecksum, decodeWithChecksum
+    )
+
+{-| Encode integers as [Crockford-style base32 strings](https://www.crockford.com/base32.html).
+
+From the specification:
+
+> Base 32 is a textual 32-symbol notation for expressing numbers in a form that can be conveniently and accurately transmitted between humans and computer systems. It can be used for out of band communication of public keys.
+>
+> The encoding scheme is required to
+>
+>   - Be human readable and machine readable.
+>   - Be compact. Humans have difficulty in manipulating long strings of arbitrary symbols.
+>   - Be error resistant. Entering the symbols must not require keyboarding gymnastics.
+>   - Be pronounceable. Humans should be able to accurately transmit the symbols to other humans using a telephone.
+
+This package provides functions for encoding and decoding base32 data.
 
 
+# Encoding & decoding
+
+@docs encode, decode
+
+
+# Checksums
+
+You can optionally insert a checksum at the end of the encoded data.
+
+@docs encodeWithChecksum, decodeWithChecksum
+
+-}
+
+
+{-| Encode an integer as a base32 string.
+
+    Crockford.encode 1337 --> "19S" : String
+
+-}
 encode : Int -> String
 encode x =
     encodeAdvanced x False
@@ -38,6 +75,11 @@ encodeAdvanced x checksum =
         |> String.fromList
 
 
+{-| Decode a base32 string to an integer.
+
+    Crockford.decode "19S" --> 1337 : Int
+
+-}
 decode : String -> Int
 decode s =
     let
