@@ -140,6 +140,9 @@ decodeSmallInt n =
         'I' ->
             1
 
+        'O' ->
+            0
+
         -- General cases:
         '0' ->
             0
@@ -238,4 +241,4 @@ decodeSmallInt n =
             31
 
         _ ->
-            0
+            -1
