@@ -26,7 +26,8 @@ encode x =
 
 decode : String -> Int
 decode s =
-    String.toList s
+    String.toUpper s
+        |> String.toList
         |> List.foldl (\chr num -> num * 32 + decodeSmallInt chr) 0
 
 

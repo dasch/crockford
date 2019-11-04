@@ -31,6 +31,13 @@ decodingTests =
         , test "`O` is treated as `0`" <|
             \_ ->
                 Expect.equal 0 (decode "O")
+        , fuzz nonNegativeInt "decoding is case insensitive" <|
+            \n ->
+                let
+                    encoded =
+                        encode n
+                in
+                Expect.equal (decode (String.toUpper encoded)) (decode (String.toLower encoded))
         ]
 
 
