@@ -26,9 +26,17 @@ encode x =
 
 decode : String -> Int
 decode s =
+    let
+        integrateChar chr num =
+            if chr == '-' then
+                num
+
+            else
+                num * 32 + decodeSmallInt chr
+    in
     String.toUpper s
         |> String.toList
-        |> List.foldl (\chr num -> num * 32 + decodeSmallInt chr) 0
+        |> List.foldl integrateChar 0
 
 
 encodeSmallInt : Int -> Char

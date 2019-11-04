@@ -34,6 +34,9 @@ decodingTests =
         , test "`O` is treated as `0`" <|
             \_ ->
                 Expect.equal 0 (decode "O")
+        , test "`-` is ignored" <|
+            \_ ->
+                Expect.equal (decode "ABCDEF123") (decode "ABC-DEF-123")
         , fuzz nonNegativeInt "decoding is case insensitive" <|
             \n ->
                 let
