@@ -1,4 +1,4 @@
-module Main exposing (main)
+module EncodingBenchmark exposing (main)
 
 import Benchmark exposing (..)
 import Benchmark.Runner exposing (BenchmarkProgram, program)
