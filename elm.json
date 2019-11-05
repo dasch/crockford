@@ -3,7 +3,7 @@
     "name": "dasch/crockford",
     "summary": "Encoding and decoding functions for Crockford's base32 encoding",
     "license": "Apache-2.0",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "exposed-modules": [
         "Crockford"
     ],
