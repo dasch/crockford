@@ -1,6 +1,7 @@
 module Crockford exposing
     ( encode, decode
     , encodeWithChecksum, decodeWithChecksum
+    , Error(..)
     )
 
 {-| Encode integers as [Crockford-style base32 strings](https://www.crockford.com/base32.html).
@@ -33,17 +34,23 @@ You can optionally insert a checksum at the end of the encoded data.
 -}
 
 
+type Error
+    = NegativeNumberError
+    | InvalidChecksum
+    | InvalidCharacter Char
+
+
 {-| Encode an integer as a base32 string.
 
-    Crockford.encode 1337 --> "19S" : String
+    Crockford.encode 1337 --> "19S" : Result Crockford.Error String
 
 -}
-encode : Int -> Result String String
+encode : Int -> Result Error String
 encode x =
     encodeAdvanced x False
 
 
-encodeAdvanced : Int -> Bool -> Result String String
+encodeAdvanced : Int -> Bool -> Result Error String
 encodeAdvanced x checksum =
     let
         encodeAsCharList : Int -> List Char
@@ -70,7 +77,7 @@ encodeAdvanced x checksum =
                 chars
     in
     if x < 0 then
-        Err "cannot encode a negative number"
+        Err NegativeNumberError
 
     else
         encodeAsCharList x
@@ -82,10 +89,10 @@ encodeAdvanced x checksum =
 
 {-| Decode a base32 string to an integer.
 
-    Crockford.decode "19S" --> 1337 : Int
+    Crockford.decode "19S" --> 1337 : Result Crockford.Error Int
 
 -}
-decode : String -> Result String Int
+decode : String -> Result Error Int
 decode s =
     let
         integrateChar chr numOrErr =
@@ -100,7 +107,7 @@ decode s =
                                 decodeChar chr
                         in
                         if encodedChar < 0 then
-                            Err ("invalid base32 character `" ++ String.fromChar chr ++ "`")
+                            Err (InvalidCharacter chr)
 
                         else
                             Ok (num * 32 + encodedChar)
@@ -379,12 +386,12 @@ checksumOf n =
     modBy checksumBase n
 
 
-encodeWithChecksum : Int -> Result String String
+encodeWithChecksum : Int -> Result Error String
 encodeWithChecksum x =
     encodeAdvanced x True
 
 
-decodeWithChecksum : String -> Result String Int
+decodeWithChecksum : String -> Result Error Int
 decodeWithChecksum s =
     let
         encodedData =
@@ -398,7 +405,7 @@ decodeWithChecksum s =
                 Ok n
 
             else
-                Err "invalid checksum"
+                Err InvalidChecksum
     in
     decode encodedData
         |> Result.andThen

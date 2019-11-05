@@ -20,6 +20,9 @@ encodingTests =
         [ test "encodes integers" <|
             \_ ->
                 Expect.equal (Ok "16J") (encode 1234)
+        , test "fails on negative integers" <|
+            \_ ->
+                Expect.equal (Err NegativeNumberError) (encode -1)
         , fuzz nonNegativeInt "round trip" <|
             \n ->
                 encode n
@@ -39,7 +42,8 @@ encodingTests =
                 Expect.equal (decode "ABCDEF123") (decode "ABC-DEF-123")
         , test "invalid symbols cause failure" <|
             \_ ->
-                Expect.equal (Err "invalid base32 character `#`") (decode "123#")
+                decode "123#"
+                    |> Expect.equal (Err (InvalidCharacter '#'))
         , fuzz nonNegativeInt "decoding is case insensitive" <|
             \n ->
                 let
@@ -63,7 +67,7 @@ checksumTests =
         , test "failing on invalid checksum symbol" <|
             \_ ->
                 decodeWithChecksum "1A@"
-                    |> Expect.equal (Err "invalid base32 character `@`")
+                    |> Expect.equal (Err (InvalidCharacter '@'))
         , fuzz nonNegativeInt "round trip" <|
             \n ->
                 encodeWithChecksum n
