@@ -1,7 +1,6 @@
 module Crockford exposing
-    ( encode, decode
+    ( encode, decode, Error(..)
     , encodeWithChecksum, decodeWithChecksum
-    , Error(..)
     )
 
 {-| Encode integers as [Crockford-style base32 strings](https://www.crockford.com/base32.html).
@@ -22,18 +21,27 @@ This package provides functions for encoding and decoding base32 data.
 
 # Encoding & decoding
 
-@docs encode, decode
+@docs encode, decode, Error
 
 
 # Checksums
 
 You can optionally insert a checksum at the end of the encoded data.
 
+This allows validating the correctness of the string at a later point. For example, you may want to allow people to communicate the string over the phone, which obviously introduces a source of error. Crockford's base32 is optimized for communication, avoiding characters that look the same, but it's still possible for characters to be swapped or omitted during communication. By encoding with a checksum, and later decoding with a checksum again, you can validate that the string has not been modified and therefore corrupted.
+
 @docs encodeWithChecksum, decodeWithChecksum
 
 -}
 
 
+{-| Encoding or decoding can fail in a couple of ways:
+
+  - `NegativeNumberError` means you tried to encode a negative integer, which isn't supported.
+  - `InvalidChecksum` means you tried to decode a base32 string with a checksum, but the checksum didn't match.
+  - `InvalidCharacter` means you tried to decode a base32 string, but an invalid character was encountered.
+
+-}
 type Error
     = NegativeNumberError
     | InvalidChecksum
@@ -386,11 +394,25 @@ checksumOf n =
     modBy checksumBase n
 
 
+{-| Like `encode`, but appends a checksum character to the end of the string.
+
+    Crockford.encodeWithChecksum 32 --> Ok "10*" : Result Crockford.Error String
+
+    Crockford.decodeWithChecksum "10*" --> Ok 32 : Result Crockford.Error Int
+
+    Crockford.decodeWithChecksum "10~" --> Err InvalidChecksum : Result Crockford.Error Int
+
+-}
 encodeWithChecksum : Int -> Result Error String
 encodeWithChecksum x =
     encodeAdvanced x True
 
 
+{-| Like `decode`, but expects a checksum character at the end of the string.
+
+See `encodeWithChecksum` for more information.
+
+-}
 decodeWithChecksum : String -> Result Error Int
 decodeWithChecksum s =
     let
