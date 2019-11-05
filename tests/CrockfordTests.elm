@@ -19,9 +19,12 @@ encodingTests =
     describe "encoding"
         [ test "encodes integers" <|
             \_ ->
-                Expect.equal "16J" (encode 1234)
+                Expect.equal (Ok "16J") (encode 1234)
         , fuzz nonNegativeInt "round trip" <|
-            \n -> Expect.equal (Ok n) (decode (encode n))
+            \n ->
+                encode n
+                    |> Result.andThen decode
+                    |> Expect.equal (Ok n)
         , test "`I` is treated as `1`" <|
             \_ ->
                 Expect.equal (Ok 1) (decode "I")
@@ -41,7 +44,7 @@ encodingTests =
             \n ->
                 let
                     encoded =
-                        encode n
+                        Result.withDefault "" (encode n)
                 in
                 Expect.equal (decode (String.toUpper encoded)) (decode (String.toLower encoded))
         ]
@@ -52,7 +55,7 @@ checksumTests =
         [ test "encoding with checksum" <|
             \_ ->
                 encodeWithChecksum 32
-                    |> Expect.equal "10*"
+                    |> Expect.equal (Ok "10*")
         , test "decoding with checksum" <|
             \_ ->
                 decodeWithChecksum "1A5"
@@ -64,7 +67,7 @@ checksumTests =
         , fuzz nonNegativeInt "round trip" <|
             \n ->
                 encodeWithChecksum n
-                    |> decodeWithChecksum
+                    |> Result.andThen decodeWithChecksum
                     |> Expect.equal (Ok n)
         ]
 

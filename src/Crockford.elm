@@ -38,12 +38,12 @@ You can optionally insert a checksum at the end of the encoded data.
     Crockford.encode 1337 --> "19S" : String
 
 -}
-encode : Int -> String
+encode : Int -> Result String String
 encode x =
     encodeAdvanced x False
 
 
-encodeAdvanced : Int -> Bool -> String
+encodeAdvanced : Int -> Bool -> Result String String
 encodeAdvanced x checksum =
     let
         encodeAsCharList : Int -> List Char
@@ -69,10 +69,15 @@ encodeAdvanced x checksum =
             else
                 chars
     in
-    encodeAsCharList x
-        |> insertChecksum
-        |> List.reverse
-        |> String.fromList
+    if x < 0 then
+        Err "cannot encode a negative number"
+
+    else
+        encodeAsCharList x
+            |> insertChecksum
+            |> List.reverse
+            |> String.fromList
+            |> Ok
 
 
 {-| Decode a base32 string to an integer.
@@ -374,7 +379,7 @@ checksumOf n =
     modBy checksumBase n
 
 
-encodeWithChecksum : Int -> String
+encodeWithChecksum : Int -> Result String String
 encodeWithChecksum x =
     encodeAdvanced x True
 
