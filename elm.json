@@ -2,7 +2,7 @@
     "type": "package",
     "name": "dasch/crockford",
     "summary": "Encoding and decoding functions for Crockford's base32 encoding",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "version": "0.0.1",
     "exposed-modules": [
         "Crockford"
