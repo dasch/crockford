@@ -107,6 +107,11 @@ encodeAdvanced x checksum =
 -}
 decode : String -> Result Error Int
 decode s =
+    decodeAdvanced False s
+
+
+decodeAdvanced : Bool -> String -> Result Error Int
+decodeAdvanced checksum s =
     let
         decodeChars : Int -> List Char -> Result Error Int
         decodeChars curr chars =
@@ -116,6 +121,21 @@ decode s =
 
                 '-' :: cs ->
                     decodeChars curr cs
+
+                [ c ] ->
+                    if checksum then
+                        validateChecksum (decodeChar c) curr
+
+                    else
+                        let
+                            n =
+                                decodeChar c
+                        in
+                        if n < 0 || n > 31 then
+                            Err (InvalidCharacter c)
+
+                        else
+                            Ok (curr * 32 + n)
 
                 c :: cs ->
                     let
@@ -501,30 +521,13 @@ See `encodeWithChecksum` for more information.
 -}
 decodeWithChecksum : String -> Result Error Int
 decodeWithChecksum s =
-    let
-        checksumResult : Result Error Int
-        checksumResult =
-            -- take the last character of the string.
-            String.right 1 s
-                -- turn it into a Maybe (Char, String) tuple.
-                |> String.uncons
-                -- discard the String.
-                |> Maybe.map Tuple.first
-                -- if there's no last character, fail with EmptyString.
-                |> Result.fromMaybe EmptyString
-                -- decode the Char into an Int.
-                |> Result.map decodeChar
+    decodeAdvanced True s
 
-        numResult : Result Error Int
-        numResult =
-            decode (String.dropRight 1 s)
 
-        validateChecksum checksum n =
-            if checksumOf n == checksum then
-                Ok n
+validateChecksum : Int -> Int -> Result Error Int
+validateChecksum checksum n =
+    if checksumOf n == checksum then
+        Ok n
 
-            else
-                Err InvalidChecksum
-    in
-    Result.map2 validateChecksum checksumResult numResult
-        |> Result.andThen identity
+    else
+        Err InvalidChecksum
