@@ -56,7 +56,7 @@ type Error
 
 {-| Encode an integer as a base32 string.
 
-    Crockford.encode 1337 --> "19S" : Result Crockford.Error String
+    Crockford.encode 1337 --> Ok "19S" : Result Crockford.Error String
 
 -}
 encode : Int -> Result Error String
@@ -67,7 +67,7 @@ encode x =
 
 {-| Decode a base32 string to an integer.
 
-    Crockford.decode "19S" --> 1337 : Result Crockford.Error Int
+    Crockford.decode "19S" --> Ok 1337 : Result Crockford.Error Int
 
 -}
 decode : String -> Result Error Int
