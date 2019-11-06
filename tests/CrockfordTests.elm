@@ -30,7 +30,7 @@ encodingTests =
                     |> Expect.equal (Err (NumberTooLarge n))
         , test "fails on negative integers" <|
             \_ ->
-                Expect.equal (Err NegativeNumberError) (encode -1)
+                Expect.equal (Err NegativeNumber) (encode -1)
         , fuzz nonNegativeInt "round trip" <|
             \n ->
                 encode n

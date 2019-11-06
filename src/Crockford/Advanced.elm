@@ -2,7 +2,7 @@ module Crockford.Advanced exposing (Error(..), decode, encode)
 
 
 type Error
-    = NegativeNumberError
+    = NegativeNumber
     | InvalidChecksum
     | InvalidCharacter Char
     | EmptyString
@@ -40,7 +40,7 @@ encode { checksum } x =
             List.foldl String.cons "" chars
     in
     if x < 0 then
-        Err NegativeNumberError
+        Err NegativeNumber
 
     else if x // 32 < 0 then
         Err (NumberTooLarge x)
