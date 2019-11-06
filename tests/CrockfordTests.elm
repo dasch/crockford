@@ -20,6 +20,14 @@ encodingTests =
         [ test "encodes integers" <|
             \_ ->
                 Expect.equal (Ok "16J") (encode 1234)
+        , test "fails on integers that are too large to be divided by 32" <|
+            \_ ->
+                let
+                    n =
+                        364432432434209
+                in
+                encode n
+                    |> Expect.equal (Err (NumberTooLarge n))
         , test "fails on negative integers" <|
             \_ ->
                 Expect.equal (Err NegativeNumberError) (encode -1)

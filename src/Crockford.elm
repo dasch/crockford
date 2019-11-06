@@ -42,6 +42,7 @@ type Error
     | InvalidChecksum
     | InvalidCharacter Char
     | EmptyString
+    | NumberTooLarge Int
 
 
 {-| Encode an integer as a base32 string.
@@ -106,3 +107,6 @@ mapError err =
 
         Advanced.EmptyString ->
             EmptyString
+
+        Advanced.NumberTooLarge n ->
+            NumberTooLarge n

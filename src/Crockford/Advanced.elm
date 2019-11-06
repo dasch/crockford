@@ -15,6 +15,7 @@ type Error
     | InvalidChecksum
     | InvalidCharacter Char
     | EmptyString
+    | NumberTooLarge Int
 
 
 encode : { checksum : Bool } -> Int -> Result Error String
@@ -27,7 +28,7 @@ encode { checksum } x =
                     n // 32
 
                 rem =
-                    modBy 32 n
+                    remainderBy 32 n
             in
             if div > 0 then
                 encodeSmallInt rem :: encodeAsCharList div
@@ -49,6 +50,9 @@ encode { checksum } x =
     in
     if x < 0 then
         Err NegativeNumberError
+
+    else if x // 32 < 0 then
+        Err (NumberTooLarge x)
 
     else
         encodeAsCharList x
