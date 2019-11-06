@@ -130,8 +130,7 @@ decode s =
 
     else
         String.toUpper s
-            |> String.toList
-            |> List.foldl integrateChar (Ok 0)
+            |> String.foldl integrateChar (Ok 0)
 
 
 encodeSmallInt : Int -> Char
