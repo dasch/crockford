@@ -20,6 +20,15 @@ encodingTests =
         [ test "encodes integers" <|
             \_ ->
                 Expect.equal (Ok "16J") (encode 1234)
+        , test "encodes big integers" <|
+            \_ ->
+                let
+                    n =
+                        364432432434208
+                in
+                encode n
+                    |> Result.andThen decode
+                    |> Expect.equal (Ok n)
         , test "fails on negative integers" <|
             \_ ->
                 Expect.equal (Err NegativeNumberError) (encode -1)
