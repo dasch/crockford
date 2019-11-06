@@ -28,6 +28,16 @@ encodingTests =
                 encode n
                     |> Result.andThen decode
                     |> Expect.equal (Ok n)
+        , fuzz Fuzz.string "decoding random strings" <|
+            \str ->
+                case decode str of
+                    Err _ ->
+                        Expect.pass
+
+                    Ok n ->
+                        encode n
+                            |> Result.andThen decode
+                            |> Expect.equal (Ok n)
         , test "`I` is treated as `1`" <|
             \_ ->
                 Expect.equal (Ok 1) (decode "I")
