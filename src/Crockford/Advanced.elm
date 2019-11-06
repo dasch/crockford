@@ -1,14 +1,5 @@
 module Crockford.Advanced exposing (Error(..), decode, encode)
 
-{-| Encoding or decoding can fail in a couple of ways:
-
-  - `NegativeNumberError` means you tried to encode a negative integer, which isn't supported.
-  - `InvalidChecksum` means you tried to decode a base32 string with a checksum, but the checksum didn't match.
-  - `InvalidCharacter` means you tried to decode a base32 string, but an invalid character was encountered.
-  - `EmptyString` means you tried to decode an empty string.
-
--}
-
 
 type Error
     = NegativeNumberError
