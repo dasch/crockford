@@ -19,6 +19,11 @@ maxIntEncoded =
         |> Result.withDefault ""
 
 
+maxIntEncodedWithChecksum =
+    Crockford.encodeWithChecksum maxInt
+        |> Result.withDefault ""
+
+
 suite : Benchmark
 suite =
     describe "Crockford"
@@ -31,5 +36,9 @@ suite =
         , describe "decode"
             [ benchmark "large integer" <|
                 \_ -> Crockford.decode maxIntEncoded
+            ]
+        , describe "decodeWithChecksum"
+            [ benchmark "large integer" <|
+                \_ -> Crockford.decodeWithChecksum maxIntEncodedWithChecksum
             ]
         ]
