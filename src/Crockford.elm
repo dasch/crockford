@@ -129,8 +129,7 @@ decode s =
         Err EmptyString
 
     else
-        String.toUpper s
-            |> String.foldl integrateChar (Ok 0)
+        String.foldl integrateChar (Ok 0) s
 
 
 encodeSmallInt : Int -> Char
@@ -261,10 +260,19 @@ decodeChar n =
         'I' ->
             1
 
+        'i' ->
+            1
+
         'L' ->
             1
 
+        'l' ->
+            1
+
         'O' ->
+            0
+
+        'o' ->
             0
 
         -- General cases:
@@ -301,67 +309,133 @@ decodeChar n =
         'A' ->
             10
 
+        'a' ->
+            10
+
         'B' ->
+            11
+
+        'b' ->
             11
 
         'C' ->
             12
 
+        'c' ->
+            12
+
         'D' ->
+            13
+
+        'd' ->
             13
 
         'E' ->
             14
 
+        'e' ->
+            14
+
         'F' ->
+            15
+
+        'f' ->
             15
 
         'G' ->
             16
 
+        'g' ->
+            16
+
         'H' ->
+            17
+
+        'h' ->
             17
 
         'J' ->
             18
 
+        'j' ->
+            18
+
         'K' ->
+            19
+
+        'k' ->
             19
 
         'M' ->
             20
 
+        'm' ->
+            20
+
         'N' ->
+            21
+
+        'n' ->
             21
 
         'P' ->
             22
 
+        'p' ->
+            22
+
         'Q' ->
+            23
+
+        'q' ->
             23
 
         'R' ->
             24
 
+        'r' ->
+            24
+
         'S' ->
+            25
+
+        's' ->
             25
 
         'T' ->
             26
 
+        't' ->
+            26
+
         'V' ->
+            27
+
+        'v' ->
             27
 
         'W' ->
             28
 
+        'w' ->
+            28
+
         'X' ->
+            29
+
+        'x' ->
             29
 
         'Y' ->
             30
 
+        'y' ->
+            30
+
         'Z' ->
+            31
+
+        'z' ->
             31
 
         -- Checksum symbols:
@@ -378,6 +452,9 @@ decodeChar n =
             35
 
         'U' ->
+            36
+
+        'u' ->
             36
 
         -- Out of bounds:
