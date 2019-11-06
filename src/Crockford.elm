@@ -422,8 +422,22 @@ See `encodeWithChecksum` for more information.
 decodeWithChecksum : String -> Result Error Int
 decodeWithChecksum s =
     let
-        encodedData =
-            String.dropRight 1 s
+        checksumResult : Result Error Int
+        checksumResult =
+            -- take the last character of the string.
+            String.right 1 s
+                -- turn it into a Maybe (Char, String) tuple.
+                |> String.uncons
+                -- discard the String.
+                |> Maybe.map Tuple.first
+                -- if there's no last character, fail with EmptyString.
+                |> Result.fromMaybe EmptyString
+                -- decode the Char into an Int.
+                |> Result.map decodeChar
+
+        numResult : Result Error Int
+        numResult =
+            decode (String.dropRight 1 s)
 
         validateChecksum checksum n =
             if checksumOf n == checksum then
@@ -432,18 +446,5 @@ decodeWithChecksum s =
             else
                 Err InvalidChecksum
     in
-    -- take the last character of the string.
-    String.right 1 s
-        -- turn it into a Maybe (Char, String) tuple.
-        |> String.uncons
-        -- discard the String.
-        |> Maybe.map Tuple.first
-        -- if there's no last character, fail with EmptyString.
-        |> Result.fromMaybe EmptyString
-        -- decode the Char into an Int.
-        |> Result.map decodeChar
-        |> Result.andThen
-            (\checksum ->
-                decode encodedData
-                    |> Result.andThen (validateChecksum checksum)
-            )
+    Result.map2 validateChecksum checksumResult numResult
+        |> Result.andThen identity
