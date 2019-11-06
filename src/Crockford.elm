@@ -108,31 +108,32 @@ encodeAdvanced x checksum =
 decode : String -> Result Error Int
 decode s =
     let
-        integrateChar chr numOrErr =
-            case numOrErr of
-                Ok base ->
-                    if chr == '-' then
-                        Ok base
+        decodeChars : Int -> List Char -> Result Error Int
+        decodeChars curr chars =
+            case chars of
+                [] ->
+                    Ok curr
+
+                '-' :: cs ->
+                    decodeChars curr cs
+
+                c :: cs ->
+                    let
+                        n =
+                            decodeChar c
+                    in
+                    if n < 0 || n > 31 then
+                        Err (InvalidCharacter c)
 
                     else
-                        let
-                            n =
-                                decodeChar chr
-                        in
-                        if n < 0 || n > 31 then
-                            Err (InvalidCharacter chr)
-
-                        else
-                            Ok (base * 32 + n)
-
-                Err err ->
-                    Err err
+                        decodeChars (curr * 32 + n) cs
     in
     if s == "" then
         Err EmptyString
 
     else
-        String.foldl integrateChar (Ok 0) s
+        String.toList s
+            |> decodeChars 0
 
 
 encodeSmallInt : Int -> Char
