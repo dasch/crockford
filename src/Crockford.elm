@@ -107,20 +107,20 @@ decode s =
     let
         integrateChar chr numOrErr =
             case numOrErr of
-                Ok num ->
+                Ok base ->
                     if chr == '-' then
-                        Ok num
+                        Ok base
 
                     else
                         let
-                            encodedChar =
+                            n =
                                 decodeChar chr
                         in
-                        if encodedChar < 0 || encodedChar > 31 then
+                        if n < 0 || n > 31 then
                             Err (InvalidCharacter chr)
 
                         else
-                            Ok (num * 32 + encodedChar)
+                            Ok (base * 32 + n)
 
                 Err err ->
                     Err err
