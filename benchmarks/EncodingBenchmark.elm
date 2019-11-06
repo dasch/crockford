@@ -14,11 +14,22 @@ maxInt =
     2 ^ 30 - 1
 
 
+maxIntEncoded =
+    Crockford.encode maxInt
+        |> Result.withDefault ""
+
+
 suite : Benchmark
 suite =
-    describe "Crockford.encode"
-        [ benchmark "small integer" <|
-            \_ -> Crockford.encode 7
-        , benchmark "large integer" <|
-            \_ -> Crockford.encode maxInt
+    describe "Crockford"
+        [ describe "encode"
+            [ benchmark "small integer" <|
+                \_ -> Crockford.encode 7
+            , benchmark "large integer" <|
+                \_ -> Crockford.encode maxInt
+            ]
+        , describe "decode"
+            [ benchmark "large integer" <|
+                \_ -> Crockford.decode maxIntEncoded
+            ]
         ]
