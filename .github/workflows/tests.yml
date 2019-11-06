@@ -12,6 +12,9 @@ jobs:
 
     - name: Setup Elm environment
       uses: JorelAli/setup-elm@v1
+      
+    - name: Install elm-test
+      run: npm install -g elm-test
 
     - name: Run tests
       run: elm-test
