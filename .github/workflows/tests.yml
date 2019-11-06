@@ -14,7 +14,7 @@ jobs:
       uses: JorelAli/setup-elm@v1
       
     - name: Install elm-test
-      run: npm install -g elm-test
+      run: npm install elm-test
 
     - name: Run tests
       run: elm-test
