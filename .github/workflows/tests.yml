@@ -1,0 +1,17 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Setup Elm environment
+      uses: JorelAli/setup-elm@v1
+
+    - name: Run tests
+      run: elm-test
