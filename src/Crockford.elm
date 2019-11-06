@@ -116,7 +116,7 @@ decode s =
                             encodedChar =
                                 decodeChar chr
                         in
-                        if encodedChar < 0 then
+                        if encodedChar < 0 || encodedChar > 31 then
                             Err (InvalidCharacter chr)
 
                         else
@@ -425,22 +425,25 @@ decodeWithChecksum s =
         encodedData =
             String.dropRight 1 s
 
-        encodedChecksum =
-            String.right 1 s
-
-        validateChecksum n checksum =
+        validateChecksum checksum n =
             if checksumOf n == checksum then
                 Ok n
 
             else
                 Err InvalidChecksum
     in
-    decode encodedData
+    -- take the last character of the string.
+    String.right 1 s
+        -- turn it into a Maybe (Char, String) tuple.
+        |> String.uncons
+        -- discard the String.
+        |> Maybe.map Tuple.first
+        -- if there's no last character, fail with EmptyString.
+        |> Result.fromMaybe EmptyString
+        -- decode the Char into an Int.
+        |> Result.map decodeChar
         |> Result.andThen
-            (\data ->
-                decode encodedChecksum
-                    |> Result.andThen
-                        (\checksum ->
-                            validateChecksum data checksum
-                        )
+            (\checksum ->
+                decode encodedData
+                    |> Result.andThen (validateChecksum checksum)
             )

@@ -67,7 +67,7 @@ checksumTests =
         , test "failing on invalid checksum symbol" <|
             \_ ->
                 decodeWithChecksum "1A@"
-                    |> Expect.equal (Err (InvalidCharacter '@'))
+                    |> Expect.equal (Err InvalidChecksum)
         , fuzz nonNegativeInt "round trip" <|
             \n ->
                 encodeWithChecksum n
