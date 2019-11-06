@@ -85,6 +85,10 @@ encodeAdvanced x checksum =
 
             else
                 chars
+
+        combineAndReverse : List Char -> String
+        combineAndReverse chars =
+            List.foldl String.cons "" chars
     in
     if x < 0 then
         Err NegativeNumberError
@@ -92,8 +96,7 @@ encodeAdvanced x checksum =
     else
         encodeAsCharList x
             |> insertChecksum
-            |> List.reverse
-            |> String.fromList
+            |> combineAndReverse
             |> Ok
 
 
