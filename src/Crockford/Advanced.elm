@@ -9,6 +9,11 @@ type Error
     | NumberTooLarge Int
 
 
+base : Int
+base =
+    32
+
+
 encode : { checksum : Bool } -> Int -> Result Error String
 encode { checksum } x =
     let
@@ -17,10 +22,10 @@ encode { checksum } x =
         encodeAsCharList n =
             let
                 div =
-                    n // 32
+                    n // base
 
                 rem =
-                    remainderBy 32 n
+                    remainderBy base n
             in
             if div > 0 then
                 encodeSmallInt rem :: encodeAsCharList div
@@ -46,7 +51,7 @@ encode { checksum } x =
         Err NegativeNumber
         -- For some large numbers, math starts to break down.
 
-    else if x // 32 < 0 then
+    else if x // base < 0 then
         Err (NumberTooLarge x)
 
     else
@@ -87,7 +92,7 @@ decode { checksum } s =
                             Err (InvalidCharacter c)
 
                         else
-                            Ok (curr * 32 + n)
+                            Ok (curr * base + n)
 
                 c :: cs ->
                     let
@@ -98,7 +103,7 @@ decode { checksum } s =
                         Err (InvalidCharacter c)
 
                     else
-                        decodeChars (curr * 32 + n) cs
+                        decodeChars (curr * base + n) cs
     in
     if s == "" then
         Err EmptyString
