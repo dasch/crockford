@@ -12,6 +12,7 @@ type Error
 encode : { checksum : Bool } -> Int -> Result Error String
 encode { checksum } x =
     let
+        -- Encodes an integer in base32 as a reverse list of chars.
         encodeAsCharList : Int -> List Char
         encodeAsCharList n =
             let
@@ -27,6 +28,7 @@ encode { checksum } x =
             else
                 [ encodeSmallInt rem ]
 
+        -- Inserts a checksum character if checksumming is enabled.
         insertChecksum : List Char -> List Char
         insertChecksum chars =
             if checksum then
@@ -35,12 +37,14 @@ encode { checksum } x =
             else
                 chars
 
+        -- Turns a reverse list of chars into a string in the right order.
         combineAndReverse : List Char -> String
         combineAndReverse chars =
             List.foldl String.cons "" chars
     in
     if x < 0 then
         Err NegativeNumber
+        -- For some large numbers, math starts to break down.
 
     else if x // 32 < 0 then
         Err (NumberTooLarge x)
@@ -61,9 +65,11 @@ decode { checksum } s =
                 [] ->
                     Ok curr
 
+                -- Dashes are ignored.
                 '-' :: cs ->
                     decodeChars curr cs
 
+                -- The last character may be a checksum character.
                 [ c ] ->
                     if checksum then
                         validateChecksum (decodeChar c) curr
