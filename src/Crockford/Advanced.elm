@@ -59,6 +59,10 @@ encode { checksum } x =
 decode : { checksum : Bool } -> String -> Result Error Int
 decode { checksum } s =
     let
+        isInvalidChar : Int -> Bool
+        isInvalidChar n =
+            n < 0 || n > 31
+
         decodeChars : Int -> List Char -> Result Error Int
         decodeChars curr chars =
             case chars of
@@ -79,7 +83,7 @@ decode { checksum } s =
                             n =
                                 decodeChar c
                         in
-                        if n < 0 || n > 31 then
+                        if isInvalidChar n then
                             Err (InvalidCharacter c)
 
                         else
@@ -90,7 +94,7 @@ decode { checksum } s =
                         n =
                             decodeChar c
                     in
-                    if n < 0 || n > 31 then
+                    if isInvalidChar n then
                         Err (InvalidCharacter c)
 
                     else
