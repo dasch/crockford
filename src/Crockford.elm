@@ -43,7 +43,6 @@ import Crockford.Advanced as Advanced
   - `InvalidChecksum` means you tried to decode a base32 string with a checksum, but the checksum didn't match.
   - `InvalidCharacter` means you tried to decode a base32 string, but an invalid character was encountered.
   - `EmptyString` means you tried to decode an empty string.
-  - `NumberTooLarge` means you tried to encode a number that is too large to work with.
 
 -}
 type Error
@@ -51,7 +50,6 @@ type Error
     | InvalidChecksum
     | InvalidCharacter Char
     | EmptyString
-    | NumberTooLarge Int
 
 
 {-| Encode an integer as a base32 string.
@@ -116,6 +114,3 @@ mapError err =
 
         Advanced.EmptyString ->
             EmptyString
-
-        Advanced.NumberTooLarge n ->
-            NumberTooLarge n

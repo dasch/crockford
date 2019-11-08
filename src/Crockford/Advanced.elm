@@ -6,12 +6,16 @@ type Error
     | InvalidChecksum
     | InvalidCharacter Char
     | EmptyString
-    | NumberTooLarge Int
 
 
 base : Int
 base =
     32
+
+
+baseFloat : Float
+baseFloat =
+    toFloat base
 
 
 encode : { checksum : Bool } -> Int -> Result Error String
@@ -22,7 +26,7 @@ encode { checksum } x =
         encodeAsCharList n =
             let
                 div =
-                    n // base
+                    floor (toFloat n / baseFloat)
 
                 rem =
                     remainderBy base n
@@ -50,9 +54,6 @@ encode { checksum } x =
     if x < 0 then
         Err NegativeNumber
         -- For some large numbers, math starts to break down.
-
-    else if x // base < 0 then
-        Err (NumberTooLarge x)
 
     else
         encodeAsCharList x
