@@ -27,7 +27,7 @@ encodingTests =
                         364432432434209
                 in
                 encode n
-                    |> Expect.equal (Err (NumberTooLarge n))
+                    |> Expect.equal (Ok "ABEC4TW311")
         , test "fails on negative integers" <|
             \_ ->
                 Expect.equal (Err NegativeNumber) (encode -1)
