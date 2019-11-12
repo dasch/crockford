@@ -1,5 +1,7 @@
 module CrockfordTests exposing (suite)
 
+import Bytes
+import Bytes.Encode
 import Crockford exposing (..)
 import Expect exposing (Expectation)
 import Fuzz
@@ -12,6 +14,7 @@ suite =
     describe "Crockford"
         [ encodingTests
         , checksumTests
+        , bytesTests
         ]
 
 
@@ -94,5 +97,30 @@ checksumTests =
         ]
 
 
+bytesTests =
+    describe "Bytes"
+        [ fuzz unsignedInt32 "encoding unsigned 32 bit integers as Bytes" <|
+            \n ->
+                Bytes.Encode.encode (Bytes.Encode.unsignedInt32 Bytes.BE n)
+                    |> encodeBytes
+                    |> Result.andThen decode
+                    |> Expect.equal (Ok n)
+        , fuzz Fuzz.string "encoding arbitrary Bytes" <|
+            \str ->
+                Bytes.Encode.sequence
+                    [ Bytes.Encode.unsignedInt32 Bytes.BE (String.length str)
+                    , Bytes.Encode.string str
+                    ]
+                    |> Bytes.Encode.encode
+                    |> encodeBytes
+                    |> Result.andThen decode
+                    |> Expect.equal (Ok 13)
+        ]
+
+
 nonNegativeInt =
     Fuzz.intRange 0 Random.maxInt
+
+
+unsignedInt32 =
+    Fuzz.intRange 0 4294967295
