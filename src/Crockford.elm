@@ -1,6 +1,7 @@
 module Crockford exposing
     ( encode, decode, Error(..)
     , encodeWithChecksum, decodeWithChecksum
+    , encodeBytes
     )
 
 {-| Encode integers as [Crockford-style base32 strings](https://www.crockford.com/base32.html).
@@ -34,6 +35,8 @@ This allows validating the correctness of the string at a later point. For examp
 
 -}
 
+import Bytes exposing (Bytes)
+import Bytes.Decode
 import Crockford.Advanced as Advanced
 
 
@@ -50,6 +53,7 @@ type Error
     | InvalidChecksum
     | InvalidCharacter Char
     | EmptyString
+    | InvalidBytes
 
 
 {-| Encode an integer as a base32 string.
@@ -98,6 +102,57 @@ decodeWithChecksum : String -> Result Error Int
 decodeWithChecksum s =
     Advanced.decode { checksum = True } s
         |> Result.mapError mapError
+
+
+
+-- Bytes
+
+
+encodeBytes : Bytes -> Result Error String
+encodeBytes bytes =
+    let
+        unsignedInt32 =
+            Bytes.Decode.unsignedInt32 Bytes.BE
+
+        width =
+            Bytes.width bytes
+
+        stepDecoder : Bytes.Decode.Decoder String
+        stepDecoder =
+            unsignedInt32
+                |> Bytes.Decode.map encode
+                |> Bytes.Decode.andThen
+                    (\result ->
+                        case result of
+                            Ok value ->
+                                Bytes.Decode.succeed value
+
+                            Err _ ->
+                                Bytes.Decode.fail
+                    )
+
+        step : ( Int, String ) -> Bytes.Decode.Decoder (Bytes.Decode.Step ( Int, String ) String)
+        step ( remainingBytes, str ) =
+            if remainingBytes <= 0 then
+                Bytes.Decode.succeed (Bytes.Decode.Done str)
+
+            else
+                Bytes.Decode.map (\x -> Bytes.Decode.Loop ( remainingBytes - 1, str ++ x )) stepDecoder
+
+        decoder : Bytes.Decode.Decoder String
+        decoder =
+            Bytes.Decode.loop ( width, "" ) step
+    in
+    case Bytes.Decode.decode decoder bytes of
+        Just str ->
+            Ok str
+
+        Nothing ->
+            Err InvalidBytes
+
+
+
+-- Utility functions
 
 
 mapError : Advanced.Error -> Error
